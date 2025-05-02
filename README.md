@@ -40,10 +40,10 @@ The recommended way to use Fast Cookie Read is through the global `window` objec
 ### Module Usage (Alternative)
 
 ```javascript
-// Import the library
-const FastCookieRead = require('fast-cookie-read');
+// Import the library in the root component
+require('fast-cookie-read');
 // or
-import FastCookieRead from 'fast-cookie-read';
+import 'fast-cookie-read';
 
 // Set a cookie
 FastCookieRead.setCookie('user', 'John');
