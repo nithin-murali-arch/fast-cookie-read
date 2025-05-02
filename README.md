@@ -4,10 +4,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Bundle Size](https://img.shields.io/bundlephobia/min/fast-cookie-read)](https://bundlephobia.com/package/fast-cookie-read)
 [![Tests](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml/badge.svg)](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml)
+[![Downloads](https://img.shields.io/npm/dm/fast-cookie-read.svg)](https://www.npmjs.com/package/fast-cookie-read)
+[![GitHub stars](https://img.shields.io/github/stars/nithin-murali-arch/fast-cookie-read.svg)](https://github.com/nithin-murali-arch/fast-cookie-read/stargazers)
 
 A high-performance, lightweight JavaScript library for efficient cookie management in the browser. Optimized for speed and memory usage.
 
-## Features
+## Why Fast Cookie Read?
 
 - 🚀 **High Performance**: Uses efficient caching and parsing strategies
 - 📦 **Lightweight**: Zero dependencies, minimal bundle size
@@ -16,44 +18,103 @@ A high-performance, lightweight JavaScript library for efficient cookie manageme
 - 🌐 **Cross-Browser**: Works in all modern browsers
 - 📝 **TypeScript Support**: Includes TypeScript definitions
 
-## Installation
+## Quick Start
 
 ```bash
 npm install fast-cookie-read
 ```
 
-## Usage
-
 ```javascript
 // Import the library
+const FastCookieRead = require('fast-cookie-read');
+// or
 import FastCookieRead from 'fast-cookie-read';
 
 // Set a cookie
-FastCookieRead.setCookie('name', 'value', {
-  expires: 7, // days
-  path: '/',
-  domain: 'example.com',
-  secure: true,
-  sameSite: 'Strict'
-});
+FastCookieRead.setCookie('user', 'John');
 
 // Get a cookie
-const value = FastCookieRead.get('name');
+const user = FastCookieRead.get('user'); // Returns 'John'
+```
 
-// Get all cookies
-const allCookies = FastCookieRead.getAll();
+## Features
+
+### High Performance
+- Efficient caching mechanism
+- Smart parsing strategies
+- Minimal DOM access
+- Memory-optimized operations
+
+### Security
+- Built-in validation
+- Secure cookie handling
+- XSS protection
+- CSRF protection
+
+### Developer Experience
+- TypeScript support
+- Comprehensive error handling
+- Clear documentation
+- Zero dependencies
+
+## Installation
+
+```bash
+# Using npm
+npm install fast-cookie-read
+
+# Using yarn
+yarn add fast-cookie-read
+
+# Using pnpm
+pnpm add fast-cookie-read
+```
+
+## Usage
+
+The library is available both as a module and globally via the `window` object when loaded in a browser environment.
+
+### Module Usage
+
+```javascript
+const FastCookieRead = require('fast-cookie-read');
+// or
+import FastCookieRead from 'fast-cookie-read';
+```
+
+### Global Usage (Browser)
+
+When included via script tag, the library is available globally:
+
+```html
+<script src="path/to/fast-cookie-read.min.js"></script>
+<script>
+  // Available as window.FastCookieRead
+  FastCookieRead.setCookie('user', 'John');
+  const user = FastCookieRead.get('user');
+</script>
+```
+
+### Basic Examples
+
+```javascript
+// Set a cookie
+FastCookieRead.setCookie('user', 'John');
+
+// Get a cookie
+const user = FastCookieRead.get('user'); // Returns 'John'
 
 // Remove a cookie
-FastCookieRead.removeCookie('name');
+FastCookieRead.removeCookie('user');
 
 // Check if a cookie exists
-const exists = FastCookieRead.hasCookie('name');
+const hasUser = FastCookieRead.hasCookie('user'); // Returns false
+
+// Get all cookies
+const allCookies = FastCookieRead.getAll(); // Returns { user: 'John', ... }
 
 // Clear all cookies
 FastCookieRead.clearAllCookies();
-
-// Get total cookie size
-const size = FastCookieRead.getCookieSize();
 ```
 
 ## API Reference
@@ -154,6 +215,20 @@ The library includes comprehensive error handling:
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
 ## License
 
 MIT © [Nithin Murali](https://github.com/nithin-murali-arch)
+
+## Support
+
+If you find this library helpful, please consider:
+- Starring the repository
+- Opening issues for bugs or feature requests
+- Contributing to the project
+- Supporting the project through [GitHub Sponsors](https://github.com/sponsors/nithin-murali-arch)

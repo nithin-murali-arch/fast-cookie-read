@@ -1,6 +1,6 @@
 {
   "name": "fast-cookie-read",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A high-performance, lightweight JavaScript library for efficient cookie management in the browser. Optimized for speed and memory usage.",
   "main": "index.js",
   "module": "index.mjs",
@@ -14,7 +14,7 @@
   "scripts": {
     "test": "jest",
     "build": "npm run minify",
-    "minify": "terser index.js -c -m -o index.min.js",
+    "minify": "terser index.js -c -m -o fast-cookie-read.min.js",
     "prepare": "npm run build"
   },
   "keywords": [
@@ -28,7 +28,14 @@
     "web",
     "client-side",
     "lightweight",
-    "zero-dependencies"
+    "zero-dependencies",
+    "cookie-manager",
+    "cookie-parser",
+    "cookie-handler",
+    "browser-cookies",
+    "web-cookies",
+    "cookie-utils",
+    "cookie-library"
   ],
   "author": "Nithin Murali <nithintecharch@gmail.com>",
   "license": "MIT",
@@ -41,7 +48,7 @@
   },
   "homepage": "https://github.com/nithin-murali-arch/fast-cookie-read#readme",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=16.0.0"
   },
   "browser": {
     "index.js": "./index.min.js"
@@ -57,5 +64,12 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/nithin-murali-arch"
+  },
+  "sideEffects": false,
+  "unpkg": "index.min.js",
+  "jsdelivr": "index.min.js"
 }
