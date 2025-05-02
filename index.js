@@ -201,7 +201,8 @@
 
     if (typeof module !== 'undefined' && module.exports) {
       module.exports = FastCookieRead;
-    } else if (typeof window !== 'undefined') {
+    }
+    if (typeof window !== 'undefined') {
       window.FastCookieRead = FastCookieRead;
     }
 })();

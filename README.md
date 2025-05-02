@@ -24,6 +24,21 @@ A high-performance, lightweight JavaScript library for efficient cookie manageme
 npm install fast-cookie-read
 ```
 
+### Recommended Usage (Browser)
+
+The recommended way to use Fast Cookie Read is through the global `window` object:
+
+```html
+<script src="path/to/fast-cookie-read.min.js"></script>
+<script>
+  // Recommended: Use window.FastCookieRead
+  window.FastCookieRead.setCookie('user', 'John');
+  const user = window.FastCookieRead.get('user');
+</script>
+```
+
+### Module Usage (Alternative)
+
 ```javascript
 // Import the library
 const FastCookieRead = require('fast-cookie-read');
@@ -74,7 +89,20 @@ pnpm add fast-cookie-read
 
 The library is available both as a module and globally via the `window` object when loaded in a browser environment.
 
-### Module Usage
+### Global Usage (Recommended)
+
+When included via script tag, the library is available globally through the `window` object:
+
+```html
+<script src="path/to/fast-cookie-read.min.js"></script>
+<script>
+  // Recommended: Use window.FastCookieRead
+  window.FastCookieRead.setCookie('user', 'John');
+  const user = window.FastCookieRead.get('user');
+</script>
+```
+
+### Module Usage (Alternative)
 
 ```javascript
 const FastCookieRead = require('fast-cookie-read');
@@ -82,39 +110,26 @@ const FastCookieRead = require('fast-cookie-read');
 import FastCookieRead from 'fast-cookie-read';
 ```
 
-### Global Usage (Browser)
-
-When included via script tag, the library is available globally:
-
-```html
-<script src="path/to/fast-cookie-read.min.js"></script>
-<script>
-  // Available as window.FastCookieRead
-  FastCookieRead.setCookie('user', 'John');
-  const user = FastCookieRead.get('user');
-</script>
-```
-
 ### Basic Examples
 
 ```javascript
 // Set a cookie
-FastCookieRead.setCookie('user', 'John');
+window.FastCookieRead.setCookie('user', 'John');
 
 // Get a cookie
-const user = FastCookieRead.get('user'); // Returns 'John'
+const user = window.FastCookieRead.get('user'); // Returns 'John'
 
 // Remove a cookie
-FastCookieRead.removeCookie('user');
+window.FastCookieRead.removeCookie('user');
 
 // Check if a cookie exists
-const hasUser = FastCookieRead.hasCookie('user'); // Returns false
+const hasUser = window.FastCookieRead.hasCookie('user'); // Returns false
 
 // Get all cookies
-const allCookies = FastCookieRead.getAll(); // Returns { user: 'John', ... }
+const allCookies = window.FastCookieRead.getAll(); // Returns { user: 'John', ... }
 
 // Clear all cookies
-FastCookieRead.clearAllCookies();
+window.FastCookieRead.clearAllCookies();
 ```
 
 ## API Reference
