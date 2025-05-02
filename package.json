@@ -35,7 +35,9 @@
     "browser-cookies",
     "web-cookies",
     "cookie-utils",
-    "cookie-library"
+    "cookie-library",
+    "typescript",
+    "types"
   ],
   "author": "Nithin Murali <nithintecharch@gmail.com>",
   "license": "MIT",

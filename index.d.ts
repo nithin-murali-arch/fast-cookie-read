@@ -160,3 +160,72 @@ declare global {
     }
 }
   
+declare interface CookieOptions {
+  expires?: Date | number;
+  maxAge?: number;
+  path?: string;
+  domain?: string;
+  secure?: boolean;
+  sameSite?: 'Strict' | 'Lax' | 'None';
+}
+
+declare interface FastCookieRead {
+  /**
+   * Sets a cookie with the specified name and value
+   * @param name - The name of the cookie
+   * @param value - The value of the cookie
+   * @param options - Optional cookie settings
+   * @throws {Error} If cookie name is empty or value is null/undefined
+   */
+  setCookie(name: string, value: string, options?: CookieOptions): void;
+
+  /**
+   * Gets the value of a cookie by name
+   * @param name - The name of the cookie to get
+   * @returns The cookie value or null if not found
+   */
+  get(name: string): string | null;
+
+  /**
+   * Gets a cookie value directly from document.cookie (less efficient)
+   * @param name - The name of the cookie to get
+   * @returns The cookie value or null if not found
+   */
+  getInefficient(name: string): string | null;
+
+  /**
+   * Gets all cookies as an object
+   * @returns Object containing all cookies
+   */
+  getAll(): Record<string, string>;
+
+  /**
+   * Removes a cookie by name
+   * @param name - The name of the cookie to remove
+   * @param options - Optional cookie settings used when setting the cookie
+   */
+  removeCookie(name: string, options?: CookieOptions): void;
+
+  /**
+   * Checks if a cookie exists
+   * @param name - The name of the cookie to check
+   * @returns True if the cookie exists, false otherwise
+   */
+  hasCookie(name: string): boolean;
+
+  /**
+   * Removes all cookies
+   */
+  clearAllCookies(): void;
+
+  /**
+   * Gets the total size of all cookies in bytes
+   * @returns The total size in bytes
+   */
+  getCookieSize(): number;
+}
+
+declare const FastCookieRead: FastCookieRead;
+
+export = FastCookieRead;
+  

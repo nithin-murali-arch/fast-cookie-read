@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/fast-cookie-read.svg)](https://www.npmjs.com/package/fast-cookie-read)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Bundle Size](https://img.shields.io/bundlephobia/min/fast-cookie-read)](https://bundlephobia.com/package/fast-cookie-read)
+[![Bundle Size](https://img.shields.io/bundlephobia/minzip/fast-cookie-read)](https://bundlephobia.com/package/fast-cookie-read)
 [![Tests](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml/badge.svg)](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml)
 [![Downloads](https://img.shields.io/npm/dm/fast-cookie-read.svg)](https://www.npmjs.com/package/fast-cookie-read)
 [![GitHub stars](https://img.shields.io/github/stars/nithin-murali-arch/fast-cookie-read.svg)](https://github.com/nithin-murali-arch/fast-cookie-read/stargazers)
@@ -16,7 +16,7 @@ A high-performance, lightweight JavaScript library for efficient cookie manageme
 - 🔒 **Secure**: Built-in validation and security features
 - 🛠 **Developer Friendly**: Comprehensive error handling and debugging
 - 🌐 **Cross-Browser**: Works in all modern browsers
-- 📝 **TypeScript Support**: Includes TypeScript definitions
+- 📝 **TypeScript Support**: Full TypeScript definitions included
 
 ## Quick Start
 
@@ -37,6 +37,28 @@ The recommended way to use Fast Cookie Read is through the global `window` objec
 </script>
 ```
 
+### TypeScript Usage
+
+```typescript
+// Import the library in the root component
+import 'fast-cookie-read';
+
+// Use with type safety
+window.FastCookieRead.setCookie('user', 'John', {
+  expires: new Date(Date.now() + 86400000),
+  path: '/',
+  secure: true,
+  sameSite: 'Strict'
+});
+
+// TypeScript will provide full type checking and autocompletion
+const user = window.FastCookieRead.get('user');
+const allCookies = window.FastCookieRead.getAll();
+
+// You can also use the less efficient method if needed
+const directValue = window.FastCookieRead.getInefficient('user');
+```
+
 ### Module Usage (Alternative)
 
 ```javascript
@@ -46,10 +68,10 @@ require('fast-cookie-read');
 import 'fast-cookie-read';
 
 // Set a cookie
-FastCookieRead.setCookie('user', 'John');
+window.FastCookieRead.setCookie('user', 'John');
 
 // Get a cookie
-const user = FastCookieRead.get('user'); // Returns 'John'
+const user = window.FastCookieRead.get('user'); // Returns 'John'
 ```
 
 ## Features
