@@ -3,7 +3,6 @@
   "version": "2.0.3",
   "description": "A high-performance, lightweight JavaScript library for efficient cookie management in the browser. Optimized for speed and memory usage.",
   "main": "index.js",
-  "module": "index.mjs",
   "types": "index.d.ts",
   "files": [
     "index.js",

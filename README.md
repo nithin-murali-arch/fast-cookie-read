@@ -85,8 +85,6 @@ const user = window.FastCookieRead.get('user'); // Returns 'John'
 ### Security
 - Built-in validation
 - Secure cookie handling
-- XSS protection
-- CSRF protection
 
 ### Developer Experience
 - TypeScript support
