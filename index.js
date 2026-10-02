@@ -1,14 +1,5 @@
 (function(){
     // Constants for better maintainability
-    const COOKIE_ATTRIBUTES = {
-      PATH: 'path',
-      DOMAIN: 'domain',
-      EXPIRES: 'expires',
-      MAX_AGE: 'max-age',
-      SECURE: 'secure',
-      SAME_SITE: 'samesite'
-    };
-
     const SAME_SITE_VALUES = ['Strict', 'Lax', 'None'];
     const DEFAULT_PATH = '/';
     const DEFAULT_SAME_SITE = 'Lax';
