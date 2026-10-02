@@ -1,7 +1,7 @@
 {
   "name": "fast-cookie-read",
   "version": "2.0.4",
-  "description": "A high-performance, lightweight JavaScript library for efficient cookie management in the browser. Optimized for speed and memory usage.",
+  "description": "Fast, zero-dependency cookie parsing and management for browsers",
   "main": "index.js",
   "types": "index.d.ts",
   "files": [
@@ -20,23 +20,11 @@
     "cookie",
     "cookies",
     "browser",
-    "fast",
-    "efficient",
     "performance",
-    "javascript",
-    "web",
-    "client-side",
     "lightweight",
     "zero-dependencies",
-    "cookie-manager",
     "cookie-parser",
-    "cookie-handler",
-    "browser-cookies",
-    "web-cookies",
-    "cookie-utils",
-    "cookie-library",
-    "typescript",
-    "types"
+    "typescript"
   ],
   "author": "Nithin Murali <nithintecharch@gmail.com>",
   "license": "MIT",

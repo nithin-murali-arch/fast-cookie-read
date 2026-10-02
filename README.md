@@ -1,13 +1,23 @@
 # Fast Cookie Read
 
-[![npm version](https://img.shields.io/npm/v/fast-cookie-read.svg)](https://www.npmjs.com/package/fast-cookie-read)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Bundle Size](https://img.shields.io/bundlephobia/minzip/fast-cookie-read)](https://bundlephobia.com/package/fast-cookie-read)
-[![Tests](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml/badge.svg)](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml)
-[![Downloads](https://img.shields.io/npm/dm/fast-cookie-read.svg)](https://www.npmjs.com/package/fast-cookie-read)
-[![GitHub stars](https://img.shields.io/github/stars/nithin-murali-arch/fast-cookie-read.svg)](https://github.com/nithin-murali-arch/fast-cookie-read/stargazers)
+Fast, zero-dependency cookie parsing and management for browsers.
 
-A high-performance, lightweight JavaScript library for efficient cookie management in the browser. Optimized for speed and memory usage.
+[![Tests](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml/badge.svg)](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml)
+[![npm version](https://img.shields.io/npm/v/fast-cookie-read.svg)](https://www.npmjs.com/package/fast-cookie-read)
+
+## Install
+
+```bash
+npm install fast-cookie-read
+```
+
+## Usage
+
+```javascript
+window.FastCookieRead.setCookie('user', 'John');
+const user = window.FastCookieRead.get('user');
+window.FastCookieRead.removeCookie('user');
+```
 
 ## Why Fast Cookie Read?
 
