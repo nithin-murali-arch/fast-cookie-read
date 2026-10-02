@@ -7,13 +7,12 @@
   "files": [
     "index.js",
     "index.min.js",
-    "index.mjs",
     "index.d.ts"
   ],
   "scripts": {
     "test": "jest",
     "build": "npm run minify",
-    "minify": "terser index.js -c -m -o fast-cookie-read.min.js",
+    "minify": "terser index.js -c -m -o index.min.js",
     "prepare": "npm run build"
   },
   "keywords": [
