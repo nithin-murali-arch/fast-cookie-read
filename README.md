@@ -301,6 +301,97 @@ Get the service in a component with `inject(CookieService)`.
 
 Add the script tag shown in [Script tag](#script-tag), then call the functions on `window.FastCookieRead`.
 
+### Read and set a cookie in Solid
+
+```jsx
+import { createSignal, onMount } from 'solid-js';
+import Cookies from 'fast-cookie-read';
+
+export default function ThemeToggle() {
+  const [theme, setTheme] = createSignal('light');
+  onMount(() => setTheme(Cookies.get('theme') === 'dark' ? 'dark' : 'light'));
+
+  function toggle() {
+    const next = theme() === 'light' ? 'dark' : 'light';
+    Cookies.setCookie('theme', next, { expires: 365, sameSite: 'Lax' });
+    setTheme(next);
+  }
+
+  return <main data-theme={theme()}><h1>Cookie theme</h1><p>Theme: <output>{theme()}</output></p><button onClick={toggle}>Toggle theme</button></main>;
+}
+```
+
+### Use a cookie in a Lit custom element
+
+Save the class below as `cookie-theme.js`. In a browser entry, import it, call `customElements.define('cookie-theme', CookieTheme)`, and place `<cookie-theme></cookie-theme>` in the page.
+
+```js
+import { LitElement, html } from 'lit';
+import Cookies from 'fast-cookie-read';
+
+export class CookieTheme extends LitElement {
+  static properties = { theme: { state: true } };
+
+  constructor() {
+    super();
+    this.theme = 'light';
+  }
+
+  firstUpdated() {
+    this.theme = Cookies.get('theme') === 'dark' ? 'dark' : 'light';
+  }
+
+  toggle() {
+    this.theme = this.theme === 'light' ? 'dark' : 'light';
+    Cookies.setCookie('theme', this.theme, { expires: 365, sameSite: 'Lax' });
+  }
+
+  render() {
+    return html`<main data-theme=${this.theme}><h1>Cookie theme</h1><p>Theme: <output>${this.theme}</output></p><button @click=${this.toggle}>Toggle theme</button></main>`;
+  }
+}
+
+```
+
+### Hydrate an Astro island
+
+Keep the cookie read in a client lifecycle hook. This Astro page renders the Solid `ThemeToggle` component above, then hydrates it in the browser.
+
+```astro
+---
+import ThemeToggle from '../components/ThemeToggle';
+---
+<ThemeToggle client:load />
+```
+
+See the [runnable Astro example](examples/frameworks/astro) for the integration configuration and component.
+
+### Read and set a cookie in Qwik
+
+```tsx
+import { component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
+import Cookies from 'fast-cookie-read';
+
+type Theme = 'light' | 'dark';
+
+export const ThemeToggle = component$(() => {
+  const theme = useSignal<Theme>('light');
+  useVisibleTask$(() => {
+    theme.value = Cookies.get('theme') === 'dark' ? 'dark' : 'light';
+  });
+
+  return <main data-theme={theme.value}><h1>Cookie theme</h1><p>Theme: <output>{theme.value}</output></p><button onClick$={() => {
+    const next = theme.value === 'light' ? 'dark' : 'light';
+    Cookies.setCookie('theme', next, { expires: 365, sameSite: 'Lax' });
+    theme.value = next;
+  }}>Toggle theme</button></main>;
+});
+```
+
+The [runnable Qwik example](examples/frameworks/qwik) builds a static page through its real server renderer. Cookie reads run only in the visible task, after the component reaches the browser.
+
+Run the [framework examples](examples/frameworks/README.md) against a local `npm pack` archive. Solid, Astro and Qwik render the same initial `light` state on the server and read the cookie in the browser. For request-dependent server output, use your framework's server cookie API.
+
 ## Browser recipes
 
 ### Store consent before loading analytics
