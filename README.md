@@ -1,7 +1,12 @@
 # fast-cookie-read
 
 [![Tests](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml/badge.svg)](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml)
-[![npm version](https://img.shields.io/npm/v/fast-cookie-read.svg)](https://www.npmjs.com/package/fast-cookie-read)
+[![npm version](https://img.shields.io/npm/v/fast-cookie-read)](https://www.npmjs.com/package/fast-cookie-read)
+[![npm downloads](https://img.shields.io/npm/dm/fast-cookie-read)](https://www.npmjs.com/package/fast-cookie-read)
+[![license](https://img.shields.io/npm/l/fast-cookie-read)](https://github.com/nithin-murali-arch/fast-cookie-read/blob/main/LICENSE)
+[![types](https://img.shields.io/npm/types/fast-cookie-read)](https://www.npmjs.com/package/fast-cookie-read)
+[![node](https://img.shields.io/node/v/fast-cookie-read)](https://www.npmjs.com/package/fast-cookie-read)
+[![minified + gzip size](https://img.shields.io/bundlejs/size/fast-cookie-read)](https://bundlejs.com/?q=fast-cookie-read)
 
 `fast-cookie-read` is a cookie library for browsers that reads, sets and deletes cookies through `document.cookie`. `get()` caches the parsed cookies and parses again only when `document.cookie` has changed since the last call. The package has no dependencies, ships TypeScript types, and `index.min.js` is 1,172 bytes minified and gzipped.
 
@@ -111,6 +116,191 @@ Deletes every cookie that JavaScript can read, using path `'/'` and no domain. C
 
 Returns the length of the URL-encoded `document.cookie` string. This is an upper bound on the bytes the browser sends, not an exact byte count.
 
+## Use it with your framework
+
+Every function reads or writes `document.cookie`, so each guide below calls the package only in browser code.
+
+### Read and set a cookie in React with Vite
+
+To keep a cookie in React state, add this hook to `src/useCookie.ts`. It reads the cookie on the first render and writes the cookie each time you call the setter.
+
+```ts
+import { useCallback, useState } from 'react';
+import FastCookieRead from 'fast-cookie-read';
+
+export function useCookie(name: string) {
+  const [value, setValue] = useState(() => FastCookieRead.get(name));
+
+  const setCookie = useCallback(
+    (next: string, options?: FastCookieRead.CookieOptions) => {
+      FastCookieRead.setCookie(name, next, options);
+      setValue(next);
+    },
+    [name],
+  );
+
+  return [value, setCookie] as const;
+}
+```
+
+Use it like `useState`. This toggle keeps the chosen theme for 365 days:
+
+```tsx
+import { useCookie } from './useCookie';
+
+export function ThemeToggle() {
+  const [theme, setTheme] = useCookie('theme');
+  const next = theme === 'dark' ? 'light' : 'dark';
+
+  return (
+    <button onClick={() => setTheme(next, { expires: 365 })}>
+      Theme: {theme ?? 'light'}
+    </button>
+  );
+}
+```
+
+Because the hook reads `document.cookie` during render, use it only in apps without server rendering. For Next.js, see [Read and set a cookie in Next.js](#read-and-set-a-cookie-in-nextjs).
+
+### Read and set a cookie in Next.js
+
+In the App Router, read and write the cookie in a client component. `useSyncExternalStore` reads the cookie only in the browser. On the server it uses the third argument, `'light'`. Save this as `app/theme-toggle.tsx` and render `<ThemeToggle />` from any page.
+
+```tsx
+'use client';
+
+import { useSyncExternalStore } from 'react';
+import FastCookieRead from 'fast-cookie-read';
+
+const listeners = new Set<() => void>();
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+export default function ThemeToggle() {
+  const theme = useSyncExternalStore(
+    subscribe,
+    () => FastCookieRead.get('theme') ?? 'light',
+    () => 'light',
+  );
+
+  function toggle() {
+    FastCookieRead.setCookie('theme', theme === 'dark' ? 'light' : 'dark', { expires: 365 });
+    listeners.forEach((listener) => listener());
+  }
+
+  return <button onClick={toggle}>Theme: {theme}</button>;
+}
+```
+
+To read cookies on the server, use `cookies()` from `next/headers`, because this package needs `document`. The component avoids `setState` inside `useEffect` because `create-next-app` enables the `react-hooks/set-state-in-effect` lint rule, which reports that call as an error.
+
+### Read and set a cookie in Vue 3
+
+To keep a cookie in a Vue `ref`, add this composable to `src/useCookie.ts`. The ref starts with the current cookie value, and each change to the ref writes the cookie. Setting the ref to `null` deletes the cookie.
+
+```ts
+import { ref, watch } from 'vue';
+import FastCookieRead from 'fast-cookie-read';
+
+export function useCookie(name: string, options?: FastCookieRead.CookieOptions) {
+  const value = ref(FastCookieRead.get(name));
+
+  watch(value, (next) => {
+    if (next === null) {
+      FastCookieRead.removeCookie(name, options);
+    } else {
+      FastCookieRead.setCookie(name, next, options);
+    }
+  });
+
+  return value;
+}
+```
+
+Use the ref in `<script setup>` like any other ref:
+
+```vue
+<script setup lang="ts">
+import { useCookie } from './useCookie';
+
+const theme = useCookie('theme', { expires: 365 });
+</script>
+
+<template>
+  <button @click="theme = theme === 'dark' ? 'light' : 'dark'">
+    Theme: {{ theme ?? 'light' }}
+  </button>
+</template>
+```
+
+In Nuxt, components also render on the server, so call this composable only on the client, inside `onMounted` or an `if (import.meta.client)` block.
+
+### Read and set a cookie in Svelte 5
+
+Read the cookie in `onMount`, which runs only in the browser, and write it in an event handler.
+
+```svelte
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import FastCookieRead from 'fast-cookie-read';
+
+  let theme = $state<string | null>(null);
+
+  onMount(() => {
+    theme = FastCookieRead.get('theme');
+  });
+
+  function toggle() {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    FastCookieRead.setCookie('theme', theme, { expires: 365 });
+  }
+</script>
+
+<button onclick={toggle}>Theme: {theme ?? 'light'}</button>
+```
+
+In SvelteKit, `onMount` does not run during server rendering, so this component is safe on server-rendered pages. To read cookies on the server, call `cookies.get()` in a server `load` function.
+
+### Wrap it in an Angular service
+
+To share cookie access across an Angular app, wrap the package in a root service. The service checks `isPlatformBrowser`, so during server rendering `get()` returns `null` and writes do nothing.
+
+```ts
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import FastCookieRead from 'fast-cookie-read';
+
+@Injectable({ providedIn: 'root' })
+export class CookieService {
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
+  get(name: string): string | null {
+    return this.isBrowser ? FastCookieRead.get(name) : null;
+  }
+
+  set(name: string, value: string, options?: FastCookieRead.CookieOptions): void {
+    if (this.isBrowser) {
+      FastCookieRead.setCookie(name, value, options);
+    }
+  }
+
+  remove(name: string): void {
+    if (this.isBrowser) {
+      FastCookieRead.removeCookie(name);
+    }
+  }
+}
+```
+
+Get the service in a component with `inject(CookieService)`.
+
+### Load it from a CDN without a build step
+
+Add the script tag shown in [Script tag](#script-tag), then call the functions on `window.FastCookieRead`.
+
 ## When to use it
 
 - You read cookies often in the browser and want repeated `get()` calls to skip parsing while the cookie string is unchanged.
@@ -173,6 +363,10 @@ Call `FastCookieRead.getAll()`. It returns an object that maps each name to its 
 ```javascript
 FastCookieRead.getAll(); // { theme: 'dark', user: 'John' }
 ```
+
+### How do I use fast-cookie-read with React, Vue, Svelte or Angular?
+
+Call it only in browser code, such as a React effect, a Vue composable, a Svelte `onMount` callback or an Angular service that checks `isPlatformBrowser`, as [Use it with your framework](#use-it-with-your-framework) shows for each one.
 
 ### Can I use fast-cookie-read with Next.js or server-side rendering?
 
