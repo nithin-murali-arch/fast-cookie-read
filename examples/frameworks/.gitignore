@@ -1,0 +1,7 @@
+*.tgz
+**/dist/
+**/.astro/
+**/node_modules/
+**/server/
+**/.ssr-smoke/
+**/package-lock.json

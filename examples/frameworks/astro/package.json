@@ -1,0 +1,18 @@
+{
+  "name": "fast-cookie-read-astro-example",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 127.0.0.1",
+    "build": "astro build",
+    "preview": "astro preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "astro": "^6.0.0",
+    "@astrojs/solid-js": "^6.0.0",
+    "solid-js": "^1.9.0",
+    "fast-cookie-read": "^2.0.6"
+  },
+  "devDependencies": {}
+}
