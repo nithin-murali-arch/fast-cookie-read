@@ -133,6 +133,11 @@
           let name = cookie.substring(0, equalSign).trim();
           let value = cookie.substring(equalSign + 1).trim();
           try {
+            name = decodeURIComponent(name);
+          } catch (e) {
+            console.warn(`Failed to decode cookie name ${name}:`, e);
+          }
+          try {
             parsedCookies[name] = decodeURIComponent(value);
           } catch (e) {
             console.warn(`Failed to decode cookie value for ${name}:`, e);
@@ -174,9 +179,6 @@
     function getCookieSize() {
       return encodeURIComponent(document.cookie).length;
     }
-
-    // Initialize
-    getAll();
 
     // Module exports
     const FastCookieRead = {
