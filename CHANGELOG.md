@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.7 (2026-10-15)
+
+- README gained badges for npm downloads, license, bundled types, supported Node versions and bundle size
+- README gained framework guides: a React hook for Vite apps, a Next.js client component, a Vue 3 composable with a Nuxt note, a Svelte 5 component with a SvelteKit note, an Angular service, and the CDN script tag
+- FAQ entry added for using the package with React, Vue, Svelte or Angular
+
 ## 2.0.6 (2026-10-15)
 
 - Importing the package no longer throws outside a browser (Node, Next.js and other SSR, test runners). Functions still need `document` when called.
