@@ -1,0 +1,15 @@
+{
+  "name": "cookie-browser-recipes",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1"
+  },
+  "dependencies": {
+    "fast-cookie-read": "^2.0.6"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.0",
+    "vite": "^6.4.1"
+  }
+}

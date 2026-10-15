@@ -301,6 +301,83 @@ Get the service in a component with `inject(CookieService)`.
 
 Add the script tag shown in [Script tag](#script-tag), then call the functions on `window.FastCookieRead`.
 
+## Browser recipes
+
+### Store consent before loading analytics
+
+The [consent banner example](examples/consent-banner/) stores `consent=analytics,marketing` for 180 days. It loads `/analytics.js` only if the saved category list includes `analytics`. Replace that URL with your provider's script URL. The necessary-only button persists a refusal and reloads the page. Loading the initializer twice still creates only one script element. Revoking consent after a provider has loaded also needs that provider's cleanup API.
+
+### Assign a checkout experiment on the first visit
+
+```javascript
+import FastCookieRead from 'fast-cookie-read';
+
+export function checkoutVariant() {
+  const saved = FastCookieRead.get('ab_checkout');
+  if (saved === 'A' || saved === 'B') return saved;
+  const variant = Math.random() < 0.5 ? 'A' : 'B';
+  FastCookieRead.setCookie('ab_checkout', variant, { expires: 30 });
+  return variant;
+}
+```
+
+Call this in the browser before choosing the checkout view. The cookie keeps the assignment for 30 days. Users who clear cookies receive a new assignment. This is suitable for presentation experiments, not authorization or price enforcement.
+
+### Keep UTM attribution until signup
+
+Capture the first landing URL in one cookie. Call `captureAttribution()` when the landing page loads in the browser.
+
+```javascript
+import FastCookieRead from 'fast-cookie-read';
+
+export function captureAttribution() {
+  if (FastCookieRead.get('attribution')) return;
+  const search = new URLSearchParams(location.search);
+  const attribution = Object.fromEntries(
+    ['utm_source', 'utm_medium', 'utm_campaign']
+      .filter((key) => search.has(key))
+      .map((key) => [key, search.get(key)]),
+  );
+  if (Object.keys(attribution).length) {
+    FastCookieRead.setCookie('attribution', JSON.stringify(attribution), { expires: 30 });
+  }
+}
+
+export function readAttribution() {
+  try {
+    return JSON.parse(FastCookieRead.get('attribution') ?? 'null');
+  } catch {
+    return null;
+  }
+}
+```
+
+On the signup page, call `readAttribution()` and include the result in the signup request. After the signup succeeds, call `FastCookieRead.removeCookie('attribution')`. Treat the result as user-controlled input on the server. The [runnable example](examples/consent-banner/) preserves the cookie across navigation to `/signup`.
+
+### Share a theme across subdomains
+
+Run this on `app.example.com`, then read the cookie on `www.example.com`:
+
+```javascript
+import FastCookieRead from 'fast-cookie-read';
+
+FastCookieRead.setCookie('theme', 'dark', {
+  domain: 'example.com',
+  expires: 365,
+  secure: true,
+});
+FastCookieRead.get('theme'); // 'dark'
+FastCookieRead.removeCookie('theme', { domain: 'example.com' });
+```
+
+The browser accepts a domain only when it matches the current hostname or a parent domain that is not a public suffix. The library rejects `localhost`, IP addresses and leading dots such as `.example.com`. Omit `domain` for a cookie limited to the current host. `secure: true` requires HTTPS. The browser check uses `app.example.test` and `www.example.test` mapped to loopback by Chrome, with a shared `example.test` cookie over local HTTP and `secure` omitted.
+
+### Watch cookie size during development
+
+Call `showCookiePanel()` from [recipes.js](examples/consent-banner/recipes.js) in a Vite app. It runs only when `import.meta.env.DEV` is true. The panel lists `getAll()` and `getCookieSize()` once per second, and warns above 3,500. Call the returned cleanup function when the page component unmounts.
+
+`getCookieSize()` returns `encodeURIComponent(document.cookie).length`, not bytes or the size of one cookie. The warning is a conservative development budget. Browsers apply their own per-cookie and total limits, so the panel cannot guarantee that a write succeeds. Avoid showing this panel on production pages because it displays readable cookie values.
+
 ## When to use it
 
 - You read cookies often in the browser and want repeated `get()` calls to skip parsing while the cookie string is unchanged.
@@ -382,7 +459,7 @@ Both are small, dependency-free browser cookie libraries. `js-cookie` is smaller
 
 ## Support
 
-`index.js` uses ES2018 syntax and is not transpiled. The package declares `node >= 16` in `engines`. The tests run on Node 22 and 24 in CI against a mocked `document.cookie` and have not been run in real browsers.
+`index.js` uses ES2018 syntax and is not transpiled. The package declares `node >= 16` in `engines`. The tests run on Node 22 and 24 in CI against a mocked `document.cookie`. The browser recipe checks also run the packed package in Google Chrome.
 
 ## Changelog
 
