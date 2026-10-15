@@ -1,0 +1,1 @@
+{"name":"cookie-migrated-app","private":true,"type":"module","scripts":{"dev":"vite","build":"vite build"},"dependencies":{"fast-cookie-read":"^2.0.6"},"devDependencies":{"vite":"^6.4.1"}}
