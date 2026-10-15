@@ -48,7 +48,7 @@ The unpkg equivalent is `https://unpkg.com/fast-cookie-read@2/index.min.js`.
 
 ### TypeScript
 
-The package includes its own type definitions. The default import and `window.FastCookieRead` are both typed.
+The package includes its own type definitions. The default import and `window.FastCookieRead` are both typed. The default import needs `esModuleInterop` or `allowSyntheticDefaultImports`, which `moduleResolution` set to `bundler` or `node16` turns on.
 
 ```typescript
 import FastCookieRead from 'fast-cookie-read';
