@@ -1,7 +1,12 @@
 # fast-cookie-read
 
 [![Tests](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml/badge.svg)](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml)
-[![npm version](https://img.shields.io/npm/v/fast-cookie-read.svg)](https://www.npmjs.com/package/fast-cookie-read)
+[![npm version](https://img.shields.io/npm/v/fast-cookie-read)](https://www.npmjs.com/package/fast-cookie-read)
+[![npm downloads](https://img.shields.io/npm/dm/fast-cookie-read)](https://www.npmjs.com/package/fast-cookie-read)
+[![license](https://img.shields.io/npm/l/fast-cookie-read)](https://github.com/nithin-murali-arch/fast-cookie-read/blob/main/LICENSE)
+[![types](https://img.shields.io/npm/types/fast-cookie-read)](https://www.npmjs.com/package/fast-cookie-read)
+[![node](https://img.shields.io/node/v/fast-cookie-read)](https://www.npmjs.com/package/fast-cookie-read)
+[![minified + gzip size](https://img.shields.io/bundlejs/size/fast-cookie-read)](https://bundlejs.com/?q=fast-cookie-read)
 
 `fast-cookie-read` is a cookie library for browsers that reads, sets and deletes cookies through `document.cookie`. `get()` caches the parsed cookies and parses again only when `document.cookie` has changed since the last call. The package has no dependencies, ships TypeScript types, and `index.min.js` is 1,172 bytes minified and gzipped.
 
