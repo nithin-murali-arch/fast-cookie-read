@@ -378,6 +378,27 @@ Call `showCookiePanel()` from [recipes.js](examples/consent-banner/recipes.js) i
 
 `getCookieSize()` returns `encodeURIComponent(document.cookie).length`, not bytes or the size of one cookie. The warning is a conservative development budget. Browsers apply their own per-cookie and total limits, so the panel cannot guarantee that a write succeeds. Avoid showing this panel on production pages because it displays readable cookie values.
 
+### Migrate from js-cookie
+
+Replace the default import with `import FastCookieRead from 'fast-cookie-read'`. Update call names and check missing-value branches:
+
+| js-cookie | fast-cookie-read | Change to check |
+| --- | --- | --- |
+| `Cookies.get('theme')` | `FastCookieRead.get('theme')` | Missing and empty values return `null`, rather than `undefined`. |
+| `Cookies.get()` | `FastCookieRead.getAll()` | Returns a decoded name/value object. |
+| `Cookies.set('theme', 'dark')` | `FastCookieRead.setCookie('theme', 'dark')` | The setter returns nothing. Do not chain calls or use its return value. |
+| `Cookies.remove('theme', options)` | `FastCookieRead.removeCookie('theme', options)` | Match the original `path` and `domain`. |
+| `{ expires: 30 }` | `{ expires: 30 }` | Both accept days or a `Date`. |
+| `{ path: '/', domain: 'example.com', secure: true }` | Same attribute names | Domain rejects localhost, IP addresses and a leading dot. |
+| `{ sameSite: 'lax' }` | `{ sameSite: 'Lax' }` | Use `'Strict'`, `'Lax'` or `'None'`. The default is `'Lax'`. |
+| `Cookies.withAttributes(options)` | Pass `options` to each write and removal | There is no default-attributes API. |
+| `Cookies.withConverter(converter)` | No equivalent | Keep js-cookie if you need a custom converter. |
+| `Cookies.set('profile', object)` | `FastCookieRead.setCookie('profile', JSON.stringify(object))` | Serialize JSON explicitly and parse it when reading. |
+
+If a caller checks `value === undefined`, change it to `value === null`. This package treats an empty cookie as missing, so applications that distinguish an empty string need a different read path. Calls need `document`; imports alone are safe during server rendering. The two libraries can differ when decoding existing values with custom encoding. Test your existing cookies before replacing reads.
+
+The [migrated Vite app](examples/js-cookie-migration/) replaces a js-cookie theme flow with explicit writes, reads and removals. The packed-consumer checks build that app and exercise its buttons in Chrome. There is no automatic codemod because converters, default attributes and return-value assumptions need application decisions.
+
 ## When to use it
 
 - You read cookies often in the browser and want repeated `get()` calls to skip parsing while the cookie string is unchanged.
