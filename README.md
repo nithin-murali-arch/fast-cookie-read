@@ -1,9 +1,9 @@
-# Fast Cookie Read
-
-Fast, zero-dependency cookie parsing and management for browsers.
+# fast-cookie-read
 
 [![Tests](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml/badge.svg)](https://github.com/nithin-murali-arch/fast-cookie-read/actions/workflows/test.yml)
 [![npm version](https://img.shields.io/npm/v/fast-cookie-read.svg)](https://www.npmjs.com/package/fast-cookie-read)
+
+`fast-cookie-read` is a cookie library for browsers that reads, sets and deletes cookies through `document.cookie`. `get()` caches the parsed cookies and parses again only when `document.cookie` has changed since the last call. The package has no dependencies, ships TypeScript types, and `index.min.js` is 1,172 bytes minified and gzipped.
 
 ## Install
 
@@ -11,269 +11,195 @@ Fast, zero-dependency cookie parsing and management for browsers.
 npm install fast-cookie-read
 ```
 
+```javascript
+import FastCookieRead from 'fast-cookie-read';
+
+FastCookieRead.setCookie('theme', 'dark', { expires: 7 });
+FastCookieRead.get('theme'); // 'dark'
+FastCookieRead.removeCookie('theme');
+FastCookieRead.get('theme'); // null
+```
+
+This runs in a browser. In Node the import works, but every call needs `document` (see [the SSR question](#can-i-use-fast-cookie-read-with-nextjs-or-server-side-rendering)).
+
 ## Usage
 
+### ES modules and CommonJS
+
 ```javascript
-window.FastCookieRead.setCookie('user', 'John');
-const user = window.FastCookieRead.get('user');
-window.FastCookieRead.removeCookie('user');
+import FastCookieRead from 'fast-cookie-read';
+// or
+const FastCookieRead = require('fast-cookie-read');
 ```
 
-## Why Fast Cookie Read?
+Loading the module in a browser also sets `window.FastCookieRead`. A bare `import 'fast-cookie-read'` is enough to get the global.
 
-- 🚀 **High Performance**: Uses efficient caching and parsing strategies
-- 📦 **Lightweight**: Zero dependencies, minimal bundle size
-- 🔒 **Secure**: Built-in validation and security features
-- 🛠 **Developer Friendly**: Comprehensive error handling and debugging
-- 🌐 **Cross-Browser**: Works in all modern browsers
-- 📝 **TypeScript Support**: Full TypeScript definitions included
-
-## Quick Start
-
-```bash
-npm install fast-cookie-read
-```
-
-### Recommended Usage (Browser)
-
-The recommended way to use Fast Cookie Read is through the global `window` object:
+### Script tag
 
 ```html
-<script src="path/to/fast-cookie-read.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fast-cookie-read@2/index.min.js"></script>
 <script>
-  // Recommended: Use window.FastCookieRead
-  window.FastCookieRead.setCookie('user', 'John');
-  const user = window.FastCookieRead.get('user');
+  FastCookieRead.setCookie('user', 'John');
+  FastCookieRead.get('user'); // 'John'
 </script>
 ```
 
-### TypeScript Usage
+The unpkg equivalent is `https://unpkg.com/fast-cookie-read@2/index.min.js`.
+
+### TypeScript
+
+The package includes its own type definitions. The default import and `window.FastCookieRead` are both typed. The default import needs `esModuleInterop` or `allowSyntheticDefaultImports`, which `moduleResolution` set to `bundler` or `node16` turns on.
 
 ```typescript
-// Import the library in the root component
-import 'fast-cookie-read';
-
-// Use with type safety
-window.FastCookieRead.setCookie('user', 'John', {
-  expires: new Date(Date.now() + 86400000),
-  path: '/',
-  secure: true,
-  sameSite: 'Strict'
-});
-
-// TypeScript will provide full type checking and autocompletion
-const user = window.FastCookieRead.get('user');
-const allCookies = window.FastCookieRead.getAll();
-
-// You can also use the less efficient method if needed
-const directValue = window.FastCookieRead.getInefficient('user');
-```
-
-### Module Usage (Alternative)
-
-```javascript
-// Import the library in the root component
-require('fast-cookie-read');
-// or
-import 'fast-cookie-read';
-
-// Set a cookie
-window.FastCookieRead.setCookie('user', 'John');
-
-// Get a cookie
-const user = window.FastCookieRead.get('user'); // Returns 'John'
-```
-
-## Features
-
-### High Performance
-- Efficient caching mechanism
-- Smart parsing strategies
-- Minimal DOM access
-- Memory-optimized operations
-
-### Security
-- Built-in validation
-- Secure cookie handling
-
-### Developer Experience
-- TypeScript support
-- Comprehensive error handling
-- Clear documentation
-- Zero dependencies
-
-## Installation
-
-```bash
-# Using npm
-npm install fast-cookie-read
-
-# Using yarn
-yarn add fast-cookie-read
-
-# Using pnpm
-pnpm add fast-cookie-read
-```
-
-## Usage
-
-The library is available both as a module and globally via the `window` object when loaded in a browser environment.
-
-### Global Usage (Recommended)
-
-When included via script tag, the library is available globally through the `window` object:
-
-```html
-<script src="path/to/fast-cookie-read.min.js"></script>
-<script>
-  // Recommended: Use window.FastCookieRead
-  window.FastCookieRead.setCookie('user', 'John');
-  const user = window.FastCookieRead.get('user');
-</script>
-```
-
-### Module Usage (Alternative)
-
-```javascript
-const FastCookieRead = require('fast-cookie-read');
-// or
 import FastCookieRead from 'fast-cookie-read';
+
+const options: FastCookieRead.CookieOptions = { expires: 7, sameSite: 'Strict' };
+FastCookieRead.setCookie('theme', 'dark', options);
+const theme: string | null = window.FastCookieRead.get('theme');
 ```
 
-### Basic Examples
+## API reference
+
+Cookie names and values are URL-encoded when written and URL-decoded when read.
+
+### `setCookie(name, value, options?)`
+
+Writes a cookie. Throws if the name is empty, the value is `null` or `undefined`, `sameSite` is not `'Strict'`, `'Lax'` or `'None'`, `maxAge` is negative or not a number, or `domain` is not a dotted domain name such as `example.com` (`localhost` is rejected).
+
+| Option | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `expires` | `number \| Date` | none | A number is days from now. Without it the cookie lasts for the session. |
+| `maxAge` | `number` | none | Seconds. |
+| `path` | `string` | `'/'` | |
+| `domain` | `string` | none | |
+| `secure` | `boolean` | not set | Adds `Secure` only when `true`. |
+| `sameSite` | `'Strict' \| 'Lax' \| 'None'` | `'Lax'` | |
 
 ```javascript
-// Set a cookie
-window.FastCookieRead.setCookie('user', 'John');
-
-// Get a cookie
-const user = window.FastCookieRead.get('user'); // Returns 'John'
-
-// Remove a cookie
-window.FastCookieRead.removeCookie('user');
-
-// Check if a cookie exists
-const hasUser = window.FastCookieRead.hasCookie('user'); // Returns false
-
-// Get all cookies
-const allCookies = window.FastCookieRead.getAll(); // Returns { user: 'John', ... }
-
-// Clear all cookies
-window.FastCookieRead.clearAllCookies();
-```
-
-## API Reference
-
-### `setCookie(name, value, options)`
-
-Sets a cookie with the specified name and value.
-
-```javascript
-FastCookieRead.setCookie('name', 'value', {
-  expires: 7, // days from now
-  maxAge: 3600, // seconds
-  path: '/',
-  domain: 'example.com',
+FastCookieRead.setCookie('session', 'abc123', {
+  expires: 7,
   secure: true,
-  sameSite: 'Strict' // 'Strict', 'Lax', or 'None'
+  sameSite: 'Strict',
 });
 ```
 
 ### `get(name)`
 
-Gets the value of a cookie by name. Returns `null` if the cookie doesn't exist.
-
-```javascript
-const value = FastCookieRead.get('name');
-```
+Returns the decoded value, or `null` if the cookie does not exist or its value is an empty string.
 
 ### `getAll()`
 
-Returns an object containing all cookies.
+Parses `document.cookie` and returns an object that maps each cookie name to its decoded value.
 
-```javascript
-const allCookies = FastCookieRead.getAll();
-```
+### `getInefficient(name)`
 
-### `removeCookie(name, options)`
-
-Removes a cookie by name.
-
-```javascript
-FastCookieRead.removeCookie('name', {
-  path: '/',
-  domain: 'example.com'
-});
-```
+Reads one cookie straight from `document.cookie` with no cache. Returns the raw value without URL-decoding it, or `null` if the cookie does not exist or its value is an empty string. Use `get()` unless you need the undecoded value.
 
 ### `hasCookie(name)`
 
-Checks if a cookie exists.
+Returns `true` if the cookie exists and its value is not an empty string.
 
-```javascript
-const exists = FastCookieRead.hasCookie('name');
-```
+### `removeCookie(name, options?)`
+
+Deletes a cookie. `options` accepts `path`, `domain`, `secure` and `sameSite`. The `path` and `domain` must match the ones the cookie was set with. The default path is `'/'`.
 
 ### `clearAllCookies()`
 
-Removes all cookies.
-
-```javascript
-FastCookieRead.clearAllCookies();
-```
+Deletes every cookie that JavaScript can read, using path `'/'` and no domain. Cookies set with another path or domain stay.
 
 ### `getCookieSize()`
 
-Returns the total size of all cookies in bytes.
+Returns the length of the URL-encoded `document.cookie` string. This is an upper bound on the bytes the browser sends, not an exact byte count.
+
+## When to use it
+
+- You read cookies often in the browser and want repeated `get()` calls to skip parsing while the cookie string is unchanged.
+- You want a small dependency-free library with bundled TypeScript types.
+- Do not use it to read cookies on the server. It has no way to parse a request `Cookie` header. Use `universal-cookie` for that.
+- Do not use it if you need custom value encoding or default attributes for every write. `js-cookie` supports both.
+
+## Alternatives
+
+| | fast-cookie-read | js-cookie 3 | universal-cookie 8 | `document.cookie` / `cookieStore` |
+| --- | --- | --- | --- | --- |
+| Runs in the browser | Yes | Yes | Yes | Yes |
+| Import is safe on the server | Yes | Yes | Yes | Not applicable |
+| Calls work without a browser | No, they throw | No, they return `undefined` | Yes, with a request cookie string | No |
+| Parses a request `Cookie` header | No | No | Yes | No |
+| TypeScript types in the package | Yes | No, separate `@types/js-cookie` | Yes | Built into the DOM lib |
+| Runtime dependencies | 0 | 0 | 1 (`cookie`) | 0 |
+| Minified and gzipped | 1,172 bytes | 876 bytes | Not measured | 0 |
+| Parsing on each `get()` | Skipped while `document.cookie` is unchanged | Every call | Every call, unless `doNotUpdate` is passed | Not applicable |
+| Custom value converters | No | Yes | No, but JSON values are parsed by default | No |
+
+`js-cookie` is the better choice if you want the smallest file, custom converters, or calls that return `undefined` instead of throwing outside a browser. `universal-cookie` is the better choice for server rendering that has to read request cookies, and it can notify you when a cookie changes. The native `document.cookie` string needs no library for a one-off read. `cookieStore` is asynchronous and not available in every browser, so check browser support before relying on it.
+
+Size figures come from `gzip -c file | wc -c` on `index.min.js` here and on `dist/js.cookie.min.js` in `js-cookie@3.0.8`.
+
+## FAQ
+
+### How do I read a cookie by name in JavaScript?
+
+Call `FastCookieRead.get(name)`. It returns the decoded value, or `null` if the cookie does not exist.
 
 ```javascript
-const size = FastCookieRead.getCookieSize();
+const theme = FastCookieRead.get('theme');
 ```
 
-## Performance
+### How do I set a cookie with an expiry in days?
 
-The library uses several optimizations to ensure high performance:
+Pass a number as `expires`. It means days from now.
 
-1. **Efficient Caching**: Maintains an in-memory cache of parsed cookies
-2. **Smart Parsing**: Only parses cookies when necessary
-3. **Minimal DOM Access**: Reduces browser reflows
-4. **Memory Efficient**: Uses shared references where possible
+```javascript
+FastCookieRead.setCookie('theme', 'dark', { expires: 7 });
+```
 
-## Error Handling
+### How do I delete a cookie?
 
-The library includes comprehensive error handling:
+Call `FastCookieRead.removeCookie(name)`. Pass the same `path` and `domain` that you used in `setCookie`, because the browser only deletes a cookie when they match.
 
-- Validates cookie names and values
-- Checks for invalid options
-- Provides clear error messages
-- Handles edge cases gracefully
+```javascript
+FastCookieRead.removeCookie('theme', { path: '/', domain: 'example.com' });
+```
 
-## Browser Support
+### How do I check if a cookie exists?
 
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-- Opera (latest)
+Call `FastCookieRead.hasCookie(name)`. It returns `true` or `false`. A cookie whose value is an empty string counts as missing.
+
+### How do I get all cookies as an object?
+
+Call `FastCookieRead.getAll()`. It returns an object that maps each name to its decoded value.
+
+```javascript
+FastCookieRead.getAll(); // { theme: 'dark', user: 'John' }
+```
+
+### Can I use fast-cookie-read with Next.js or server-side rendering?
+
+Importing the package is safe on the server, but every function call needs `document`, so call it only in the browser. On the server, calls throw `ReferenceError: document is not defined`. In React, call it inside `useEffect` or an event handler.
+
+### Can it read HttpOnly cookies?
+
+No. Browsers hide HttpOnly cookies from JavaScript, so `document.cookie`, and every library built on it, cannot see them. Read them on the server from the request headers.
+
+### How does it compare to js-cookie?
+
+Both are small, dependency-free browser cookie libraries. `js-cookie` is smaller (876 bytes against 1,172) and supports custom converters. `fast-cookie-read` bundles its TypeScript types and skips parsing while `document.cookie` is unchanged, where `js-cookie` parses on every `get()`. See the [alternatives table](#alternatives).
+
+## Support
+
+`index.js` uses ES2018 syntax and is not transpiled. The package declares `node >= 16` in `engines`. The tests run on Node 22 and 24 in CI against a mocked `document.cookie` and have not been run in real browsers.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Contributions are welcome. Fork the repository, create a branch, run `npm test` and `npm run test:types`, and open a pull request.
 
 ## License
 
 MIT © [Nithin Murali](https://github.com/nithin-murali-arch)
 
-## Support
-
-If you find this library helpful, please consider:
-- Starring the repository
-- Opening issues for bugs or feature requests
-- Contributing to the project
-- Supporting the project through [GitHub Sponsors](https://github.com/sponsors/nithin-murali-arch)
+Sponsor the project on [GitHub Sponsors](https://github.com/sponsors/nithin-murali-arch).
