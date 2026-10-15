@@ -1,0 +1,66 @@
+import assert from 'node:assert/strict';
+import { spawn, execFileSync } from 'node:child_process';
+import { chromium } from 'playwright';
+if (!process.argv[2]) throw new Error('Pass an absolute npm pack tarball path.');
+execFileSync('npm', ['install', '--no-save', '--package-lock=false', process.argv[2]], { stdio: 'inherit' });
+const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '4178', '--strictPort'], { stdio: ['ignore', 'pipe', 'inherit'] });
+await new Promise((resolve, reject) => { server.stdout.on('data', (chunk) => { if (chunk.toString().includes('Local:')) resolve(); }); server.once('exit', () => reject(new Error('Vite exited'))); });
+let browser;
+try {
+browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--no-proxy-server', '--host-resolver-rules=MAP app.example.test 127.0.0.1,MAP www.example.test 127.0.0.1'] });
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  let analytics = 0;
+  page.on('request', (request) => { if (new URL(request.url()).pathname === '/analytics.js') analytics++; });
+  await page.goto('http://127.0.0.1:4178');
+  await page.waitForSelector('#cookie-panel');
+  assert.equal(analytics, 0);
+  await page.click('#accept');
+  await page.waitForFunction(() => window.analyticsLoads === 1);
+  assert.equal(analytics, 1);
+  assert.ok((await context.cookies()).find((c) => c.name === 'consent').expires > Date.now() / 1000 + 179 * 86400);
+  await page.reload();
+  await page.waitForFunction(() => window.analyticsLoads === 1);
+  assert.equal(analytics, 2);
+  await page.evaluate(async () => { const { loadAnalytics } = await import('/recipes.js'); loadAnalytics(); loadAnalytics(); });
+  assert.equal(analytics, 2);
+  console.log('consent: 0 before consent; 1 after accept; 1 after reload; idempotent initializer; 180-day expiry');
+  const counts = await page.evaluate(async () => {
+    const { checkoutVariant } = await import('/recipes.js');
+    const counts = { A: 0, B: 0 };
+    for (let i = 0; i < 1000; i++) {
+      window.FastCookieRead.removeCookie('ab_checkout');
+      const value = checkoutVariant();
+      if (checkoutVariant() !== value) throw new Error('Repeat assignment changed');
+      counts[value]++;
+    }
+    return counts;
+  });
+  assert.ok(counts.A > 400 && counts.A < 600, JSON.stringify(counts));
+  const assigned = await page.evaluate(() => window.FastCookieRead.get('ab_checkout'));
+  await page.reload();
+  assert.equal(await page.evaluate(async () => (await import('/recipes.js')).checkoutVariant()), assigned);
+  console.log('A/B: ' + JSON.stringify(counts) + '; 1000 repeat calls stable; persists on reload');
+  await page.goto('http://127.0.0.1:4178/?utm_source=newsletter&utm_medium=email&utm_campaign=autumn%20sale');
+  await page.waitForFunction(() => document.querySelector('#attribution').textContent.includes('newsletter'));
+  await page.click('a');
+  await page.waitForURL('**/signup');
+  assert.deepEqual(JSON.parse(await page.textContent('#attribution')), { utm_source: 'newsletter', utm_medium: 'email', utm_campaign: 'autumn sale' });
+  await page.click('#signup');
+  assert.equal(await page.evaluate(() => window.FastCookieRead.get('attribution')), null);
+  console.log('UTM: all fields survive two page loads; successful signup clears cookie');
+  await page.evaluate(() => window.FastCookieRead.setCookie('large', 'x'.repeat(3550)));
+  await page.waitForFunction(() => document.querySelector('#cookie-panel').textContent.includes('Warning:'));
+  assert.ok((await page.textContent('#cookie-panel')).includes('large'));
+  console.log('panel: cookie list and warning above 3500 encoded characters');
+  await page.goto('http://app.example.test:4178');
+  await page.waitForSelector('#cookie-panel');
+  await page.evaluate(() => window.FastCookieRead.setCookie('theme', 'dark', { domain: 'example.test', expires: 365 }));
+  await page.goto('http://www.example.test:4178');
+  await page.waitForSelector('#cookie-panel');
+  assert.equal(await page.evaluate(() => window.FastCookieRead.get('theme')), 'dark');
+  await page.evaluate(() => window.FastCookieRead.removeCookie('theme', { domain: 'example.test' }));
+  assert.equal(await page.evaluate(() => window.FastCookieRead.get('theme')), null);
+  console.log('domain: app.example.test writes; www.example.test reads/removes shared cookie');
+  await context.close();
+} finally { await browser?.close(); server.kill(); }

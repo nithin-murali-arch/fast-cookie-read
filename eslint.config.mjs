@@ -7,5 +7,5 @@ export default [
       'no-console': 'off',
     },
   },
-  { ignores: ['index.min.js', 'node_modules/', 'coverage/'] },
+  { ignores: ['index.min.js', 'node_modules/', 'coverage/', '**/dist/**', '**/.astro/**', '**/.ssr-smoke/**', 'examples/frameworks/qwik/server/**'] },
 ];
