@@ -7,6 +7,7 @@
 [![types](https://img.shields.io/npm/types/fast-cookie-read)](https://www.npmjs.com/package/fast-cookie-read)
 [![node](https://img.shields.io/node/v/fast-cookie-read)](https://www.npmjs.com/package/fast-cookie-read)
 [![minified + gzip size](https://img.shields.io/bundlejs/size/fast-cookie-read)](https://bundlejs.com/?q=fast-cookie-read)
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ea4aaa?logo=githubsponsors)](https://github.com/sponsors/nithin-murali-arch)
 
 `fast-cookie-read` is a cookie library for browsers that reads, sets and deletes cookies through `document.cookie`. `get()` caches the parsed cookies and parses again only when `document.cookie` has changed since the last call. The package has no dependencies, ships TypeScript types, and `index.min.js` is 1,172 bytes minified and gzipped.
 
@@ -392,8 +393,10 @@ See [CHANGELOG.md](CHANGELOG.md).
 
 Contributions are welcome. Fork the repository, create a branch, run `npm test` and `npm run test:types`, and open a pull request.
 
+## Sponsor
+
+If this package saves you time, you can support its maintenance through [GitHub Sponsors](https://github.com/sponsors/nithin-murali-arch).
+
 ## License
 
 MIT © [Nithin Murali](https://github.com/nithin-murali-arch)
-
-Sponsor the project on [GitHub Sponsors](https://github.com/sponsors/nithin-murali-arch).
